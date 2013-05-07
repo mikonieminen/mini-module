@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Module test</title>
+    <meta charset="utf-8">
+    <script src="/mini-module.js" type="text/javascript"></script>
+    <script src="test_module_1.js" type="text/javascript" data-module-name="test_module_1"></script>
+    <script src="test_module_2.js" type="text/javascript" data-module-name="test_module_2"></script>
+    <script src="test_module_3.js" type="text/javascript" data-module-name="test_module_3"></script>
+    <script src="main.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <h1>Testing module, exports and require</h1>
+    <script type="text/javascript">
+      document.addEventListener('readystatechange', function(event) {
+          // expect all scripts loaded when ready state is complete
+          if (document.readyState === "complete") {
+              console.log("Document ready, require all test modules.");
+              var mod1 = require('test_module_1');
+              console.log("Test module 1: " + JSON.stringify(mod1, null, '\t'));
+              var mod2 = require('test_module_2');
+              console.log("Test module 2: " + JSON.stringify(mod2, null, '\t'));
+              var mod3 = require('test_module_3');
+              console.log("Test module 3: " + JSON.stringify(mod3, null, '\t'));
+          }
+      });
+    </script>
+  </body>
+</html>
