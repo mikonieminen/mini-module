@@ -1,8 +1,9 @@
 
+Minimalistic module implementation to be used in browsers to replicate functionality of node.js
 
 # About #
 
-# Using #
+# Usage #
 
 # Examples #
 
