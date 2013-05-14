@@ -36,7 +36,7 @@ If you use module instead of exports when setting exports, you should have:
 	thing2: thing2
     };
 })(typeof module !== "undefined" ? module : null);
-</pre>
+```
 
 In general the module should have format:
 (function(module or exports) {
