@@ -39,9 +39,43 @@ If you use module instead of exports when setting exports, you should have:
 ```
 
 In general the module should have format:
+```javascript
 (function(module or exports) {
+    // Require other modules needed by this module
+    var mod1 = require("./module1.js");
+    var mod2 = require("module2");
+
+    // Module's internal variables
+    var private1 = null;
+    var private2 = null;
+
+    // Module's private methods
+    function myPrivateFunc1() {
+        // ...
+    }
 
 
+    // Module's public methods
+    function myPublicFunc1() {
+        // ...
+    }
+
+    function myPublicFunc2() {
+        // ...
+    }
+    
+    // Use module object for defining the API
+    module.exports = {
+        myPublicFunc1: myPublicFunc1,
+    	myPublicFunc2: myPublicFunc2
+    };
+
+    // Use exports for defining the API
+    exports.myPublicFunc1 = myPublicFunc1;
+    exports.myPublicFunc2 = myPublicFunc2;
+
+})(module or exports object);
+```
 
 In HTML you should have your modules included in the head:
 ```html
