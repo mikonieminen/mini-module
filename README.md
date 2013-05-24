@@ -1,13 +1,13 @@
 
 # About #
 
-Mini-module is about providing node.js module, exports and require functionality in browsers. Idea is to provide as close as possible experience with a minimalistic framework.
+Mini-module is about providing node.js *module*, *exports* and *require* functionality in browsers. Idea is to provide as close as possible experience with a minimalistic framework.
 
 # Usage #
 
 All code that works in node.js should work in the browser as long as all required modules are implemented.
 
-Examples under "test" introduce also a pattern for writing modules such a way that global namespace is not polluted when running the code inside a browsers.
+Examples under "test" introduce also a pattern for writing modules such a way that global namespace is not polluted when running the code inside a browsers. Using proper encapsulation is important especially when modules might be required by multiple modules. The modularization pattern used here works well for browsers and node.js (though in node.js it provides no additional value).
 
 The pattern for modularization should follow appoach:
 ```javascript
@@ -86,15 +86,14 @@ Attribute data-module-name allows you to use module names instead of relative pa
 
 # Examples #
 
-Under "test" you can find some test code that show basics.
+Under "test" you can find some test code that show some basic use cases.
 
 # Restrictions #
 
 ## Using require ##
 
-It is best to use require in the body of your module so that when the module is evaluated/executed, all reqiures are called in right time and place. Especially if you use relative paths when calling require, there is no quarantee that the assosiated module can be found.
+Use require in the body of your module so that when the module is evaluated/executed relative paths can be calculated correctly. Relative paths require that you can get the currently running script and that script needs to match to file that calls require. If require is used in callbacks or some methods called by some other script, then currentScript will point to wrong script and required module might not be found. Other solution is to use module names when using require, those will work in any place require is called.
 
-## Minimizing ##
+## Minimizing the code ##
 
-Do now minimize your code into single file, this mini-module does not work well together with that. Minimizing individual modules works just fine.
-
+Do not minimize your code into single file, mini-module does not work well together with that. Minimizing individual modules works just fine.
