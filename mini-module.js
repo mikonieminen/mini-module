@@ -1,15 +1,96 @@
+/**
+ * @author Miko Nieminen <miko.nieminen@iki.fi>
+ * @license {@link http://opensource.org/licenses/MIT|MIT}
+ *
+ * @name mini-module
+ * @module
+ *
+ * @example <caption>Writing module and using exports.</caption>
+ * (function(exports) {
+ *
+ *     var message = "Hello";
+ *
+ *     exports.mesage = message;
+ *
+ * })(typeof exports !== "undefined" ? exports : this.myModule = {});
+ *
+ * @example <caption>Writing module and using module.exports.</caption>
+ * (function(module) {
+ *
+ *     var message = "Hello";
+ *
+ *     module.exports = {
+ *         message: message
+ *     };
+ *
+ * })(typeof module !== "undefined" ? module : null);
+ *
+ * @example <caption>Using require.</caption>
+ * (function(module) {
+ *     // Require by module name
+ *     var otherModule = require("other-module-name");
+ *
+ *     // Require by relative path to another module
+ *     var anotherModule = require("../another_module.js");
+ *
+ *     var message = "Hello";
+ *
+ *     function hello() {
+ *         console.log(message);
+ *     }
+ *
+ *     module.exports = {
+ *         message: message,
+ *         hello: hello
+ *     };
+ *
+ * })(typeof module !== "undefined" ? module : null);
+ */
+
+/**
+ * @external window
+ */
+
+/**
+ * @external document
+ */
 (function() {
+    /**
+     * Maps module names to module objects.
+     *
+     * @name module:mini-module.modulesByName
+     * @property {Object.<string, mini-module.Module>} Maps module names to Module objects.
+     * @private
+     */
     var modulesByName = {};
+
+    /**
+     * Maps module URLs to module objects.
+     *
+     * @name module:mini-module.modulesByURL
+     * @property {Object.<String, mini-module.Module>} Mas URLs to Module objects.
+     * @private
+     */
     var modulesByURL = {};
 
-    var documentRoot = document.location.href.substr(0, document.location.href.lastIndexOf('/') + 1);
+    if (document) {
+        var documentRoot = document.location.href.substr(0, document.location.href.lastIndexOf('/') + 1);
+    }
 
+    /**
+     * Function to polyfill currentScript implementation in
+     * browsers that do not support it yet.
+     *
+     * @name module:mini-module.currentScript
+     * @private
+     * @returns Script element matching with currently running script.
+     */
     function currentScript() {
         var s;
         var url;
         var l;
         var scripts;
-        if (document.currentScript) {
+        if (document && document.currentScript) {
             // By default use document.currentScript if supported
             s = document.currentScript;
         } else {
@@ -45,18 +126,45 @@
         return s;
     }
 
+    /**
+     * Helper to turn any URL to absolute URL
+     *
+     * @name module:mini-module.getFullURL
+     * @private
+     * @returns Return URL in absolute form
+     */
     function getFullURL(url) {
         var a = document.createElement('a');
         a.href = url;
         return a.href;
     }
 
+    /**
+     * Module.
+     *
+     * @name module:mini-module.Module
+     * @constructor
+     * @private
+     *
+     * @param {String} url Full URL that was used to load the module.
+     * @param {String} name Name of the module.
+     *
+     * @property {Object} exports Object that contains module's public API.
+     * @property {String} url URL used to load the module.
+     * @property {String} name Name of the module.
+     */
     function Module(url, name) {
         this.exports = {};
         this.url = url;
         this.name = name;
     }
 
+    /**
+     * Exports object that allows modules to export their API.
+     *
+     * @name external:window.exports
+     * @see {@link http://nodejs.org/api/modules.html#modules_module_exports|Node.js module.exports}
+     */
     Object.defineProperty(window, "exports", {
         configurable: false,
         enumerable: true,
@@ -86,6 +194,14 @@
         }
     });
 
+    /**
+     * This exposes Module object to module during module evaluation.
+     * This implementation proves similar functionality as node.js modules,
+     * but is incomplete implementation.
+     *
+     * @name external:window.module
+     * @see {@link http://nodejs.org/api/modules.html|Node.js module}
+     */
     Object.defineProperty(window, "module", {
         configurable: false,
         enumerable: true,
@@ -115,17 +231,23 @@
         }
     });
 
-    window.require = function(module) {
-        var moduleObj;
-        if (module.match(/.*\.js$/)) {
-            moduleObj = modulesByURL[getFullURL(module)];
+    /**
+     * This implementation of node.js module.require(id).
+     *
+     * @name external:window.require
+     * @see {@link http://nodejs.org/api/modules.html#modules_module_require_id|Node.js module.require(id)}
+     */
+    window.require = function(id) {
+        var module;
+        if (id.match(/.*\.js$/)) {
+            module = modulesByURL[getFullURL(id)];
         } else {
-            moduleObj = modulesByName[module];
+            module = modulesByName[id];
         }
-        if (moduleObj instanceof Module) {
-            return moduleObj.exports;
+        if (module instanceof Module) {
+            return module.exports;
         } else {
-            throw new Error("Cannot find module '" + module + "'");
+            throw new Error("Cannot find module '" + id + "'");
         }
     };
 })();
