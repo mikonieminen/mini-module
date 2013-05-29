@@ -55,6 +55,8 @@
  * @external document
  */
 (function() {
+    "use strict"
+
     /**
      * Maps module names to module objects.
      *
