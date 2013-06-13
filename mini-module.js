@@ -77,6 +77,7 @@
 
     if (document) {
         var documentRoot = document.location.href.substr(0, document.location.href.lastIndexOf('/') + 1);
+        modulesByURL[document.location.href] = new Module(document.location.href);
     }
 
     /**
@@ -125,6 +126,9 @@
                 }
             }
         }
+        if (!s) {
+            s = document.location.href;
+        }
         return s;
     }
 
@@ -141,6 +145,12 @@
         return a.href;
     }
 
+    function getDirName(url) {
+        var a = document.createElement('a');
+        a.href = url;
+        return a.pathname.substr(0, a.pathname.lastIndexOf('/') + 1);
+    }
+
     /**
      * Module.
      *
@@ -154,12 +164,37 @@
      * @property {Object} exports Object that contains module's public API.
      * @property {String} url URL used to load the module.
      * @property {String} name Name of the module.
+     * @property {String} dirname Pathname of module until last '/'.
      */
     function Module(url, name) {
         this.exports = {};
         this.url = url;
         this.name = name;
+        this.dirname = getDirName(url);
     }
+
+    /**
+     * Actual require functionality used by modules.
+     *
+     * @param {String} id Either relative path to module (relative to caller) or module name.
+     * @returns Return module matching passed ID.
+     */
+    Module.prototype.require = function(id) {
+        var module;
+        if (id.match(/^\/.*$/)) {
+            throw new Error("Absolute paths are not supported by require. Use relative path or module name.");
+        } else if (id.match(/^.*\.js$/)) {
+            // console.log("Module: " + this.name + ", url: " + this.url + ", dirname: " + this.dirname);
+            module = modulesByURL[getFullURL(this.dirname + id)];
+        } else {
+            module = modulesByName[id];
+        }
+        if (module instanceof Module) {
+            return module.exports;
+        } else {
+            throw new Error("Cannot find module '" + id + "'");
+        }
+    };
 
     /**
      * Exports object that allows modules to export their API.
@@ -239,17 +274,35 @@
      * @name external:window.require
      * @see {@link http://nodejs.org/api/modules.html#modules_module_require_id|Node.js module.require(id)}
      */
-    window.require = function(id) {
-        var module;
-        if (id.match(/.*\.js$/)) {
-            module = modulesByURL[getFullURL(id)];
-        } else {
-            module = modulesByName[id];
+    Object.defineProperty(window, "require", {
+        configurable: false,
+        enumerable: true,
+        get: function() {
+            var module = null;
+            var script = currentScript();
+            var url = null;
+            var name = null;
+
+            if (!script) {
+                url = getFullURL(script.src);
+                name = script.dataset["moduleName"];
+            } else {
+                url = document.location.href;
+                name = null;
+            }
+
+            if (name && modulesByName[name]) {
+                // console.log("window.module, found module by name: " + name);
+                module = modulesByName[name];
+            } else if (modulesByURL[url]) {
+                // console.log("window.module, found module by URL: " + url);
+                module = modulesByURL[url];
+            } else {
+                throw new Error("Cannot find matching module.");
+            }
+            // console.log("window.module, return module: " + JSON.stringify(module));
+            // console.log("\n");
+            return module.require.bind(module);
         }
-        if (module instanceof Module) {
-            return module.exports;
-        } else {
-            throw new Error("Cannot find module '" + id + "'");
-        }
-    };
+    });
 })();
