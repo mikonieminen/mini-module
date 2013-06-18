@@ -1,6 +1,4 @@
-console.log("Executing test_module_1.js");
-
-(function(exports) {
+;(function(exports) {
 
     exports.name = "Module 1";
 

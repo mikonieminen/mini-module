@@ -1,6 +1,4 @@
-console.log("Executing test_module_2.js");
-
-(function(exports) {
+;(function(exports) {
     exports.name = "Module 2";
     exports.callMe = function(cb) {
         setTimeout(function() {
