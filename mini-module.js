@@ -219,6 +219,7 @@
                 module = modulesByName[name];
             } else {
                 // console.log("window.exports, new module name: " + name + ", URL: " + url);
+                // console.log("window.exports, defined by script: ", script);
                 module = new Module(url, name);
                 if (name) {
                     modulesByName[name] = module;
@@ -226,7 +227,6 @@
                 modulesByURL[url] = module;
             }
             // console.log("window.exports, return exports of module: " + JSON.stringify(module));
-            // console.log("\n");
             return module.exports;
         }
     });
@@ -256,6 +256,7 @@
                 module = modulesByName[name];
             } else {
                 // console.log("window.module, new module name: " + name + ", URL: " + url);
+                // console.log("window.module, defined by script: ", script);
                 module = new Module(url, name);
                 if (name) {
                     modulesByName[name] = module;
@@ -263,7 +264,6 @@
                 modulesByURL[url] = module;
             }
             // console.log("window.module, return module: " + JSON.stringify(module));
-            // console.log("\n");
             return module;
         }
     });
@@ -301,7 +301,6 @@
                 throw new Error("Cannot find matching module.");
             }
             // console.log("window.module, return module: " + JSON.stringify(module));
-            // console.log("\n");
             return module.require.bind(module);
         }
     });
