@@ -1,7 +1,7 @@
 {
     "name": "mini-module",
     "description": "Simple module implementation for providing node.js kind of modules and require for browser environments",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "author": "Miko Nieminen <miko.nieminen@iki.fi>",
     "keywords": ["modules"],
     "main": "mini-module.js",
