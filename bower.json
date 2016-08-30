@@ -1,0 +1,21 @@
+{
+  "name": "mini-module",
+  "main": "mini-module.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mikonieminen/mini-module",
+  "authors": [
+    "Miko Nieminen <miko.nieminen@iki.fi>"
+  ],
+  "description": "Node.js require syntax for browser side modules",
+  "keywords": [
+    "mini-module"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
